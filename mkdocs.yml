@@ -1,0 +1,26 @@
+site_name: Axiom
+site_url: https://axiom.voxelpi.net/wiki
+theme:
+  name: material
+  logo: assets/axiom.svg
+  favicon: assets/axiom.svg
+  homepage: https://axiom.voxelpi.net
+  features:
+    - navigation.sections
+  palette:
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: green
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: green
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
