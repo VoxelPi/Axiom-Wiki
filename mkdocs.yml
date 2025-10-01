@@ -1,5 +1,7 @@
 site_name: Axiom
 site_url: https://axiom.voxelpi.net
+plugins:
+  - tags
 theme:
   name: material
   logo: assets/axiom.svg
@@ -7,6 +9,8 @@ theme:
   homepage: https://axiom.voxelpi.net
   features:
     - navigation.sections
+    - navigation.path
+    - navigation.top
   palette:
 
     # Palette toggle for light mode
