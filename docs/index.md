@@ -1,17 +1,19 @@
-# Welcome to MkDocs
+# Home
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+This is the home page of the AXIOM project.
 
-## Commands
+## Architectures
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+### [AX08](https://github.com/VoxelPi/AX08)
 
-## Project layout
+A general purpose, 8-bit computer.
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+## Tools
+
+### [AXSDK](https://github.com/VoxelPi/Axiom/)
+
+A toolkit for developing on the axiom computing platform.
+
+### [THEOREM](https://github.com/VoxelPi/Theorem)
+
+A custom programming language designed for the axiom computing platform.
