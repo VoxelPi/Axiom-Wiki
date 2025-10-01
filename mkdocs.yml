@@ -1,5 +1,5 @@
 site_name: Axiom
-site_url: https://axiom.voxelpi.net/wiki
+site_url: https://axiom.voxelpi.net
 theme:
   name: material
   logo: assets/axiom.svg
