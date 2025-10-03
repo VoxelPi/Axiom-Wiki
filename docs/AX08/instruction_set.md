@@ -33,11 +33,11 @@ The logic operations take the values of `A` and `B` and perform a bitwise logica
 Operation | Value | Description
 :---:| :---: | ---
 AND | `0b00010` | Bitwise and.
-NAND | `0b00011` | Bitwise and.
-OR  | `0b00100` | Bitwise and.
-NOR | `0b00101` | Bitwise and.
-XOR | `0b00110` | Bitwise and.
-XNOR | `0b00111` | Bitwise and.
+NAND | `0b00011` | Bitwise nand.
+OR  | `0b00100` | Bitwise or.
+NOR | `0b00101` | Bitwise nor.
+XOR | `0b00110` | Bitwise xor.
+XNOR | `0b00111` | Bitwise xnor.
 
 ### Arithmetic
 
@@ -45,10 +45,10 @@ The arithmetic operations take the values of `A` and `B` and perform an arithmet
 
 Operation | Value | Description
 :---:| :---: | ---
-ADD | `0b01000` | Calculates `A` + `B`
-SUBTRACT | `0b01001` | Calculates `A` - `B`
-ADD WITH CARRY | `0b01010` | Calculates `A` + `B` + `carry`
-SUBTRACT WITH CARRY | `0b01011` | Calculates `A` - `B` - (1 - `carry`)
+ADD | `0b01000` | Calculates `A` + `B`.
+SUBTRACT | `0b01001` | Calculates `A` - `B`.
+ADD WITH CARRY | `0b01010` | Calculates `A` + `B` + `carry`.
+SUBTRACT WITH CARRY | `0b01011` | Calculates `A` - `B` - (1 - `carry`).
 
 ### Shift
 
@@ -99,7 +99,7 @@ The break instruction causes the ax08 computer to halt at the end of the instruc
 
 Operation | Value | Description
 :---:| :---: | ---
-POLL | `0b11111` | Causes the computer to halt.
+BREAK | `0b11111` | Causes the computer to halt.
 
 
 ## Conditions
