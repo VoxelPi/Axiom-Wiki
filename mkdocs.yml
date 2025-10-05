@@ -1,11 +1,19 @@
 site_name: Axiom
 site_url: https://axiom.voxelpi.net
+repo_url: https://github.com/VoxelPi/Axiom-Wiki
+repo_name: voxelpi/axiom-wiki
+copyright: Copyright &copy; 2025 Oliver Seiter, Peter Smek
 plugins:
+  - search
   - tags
+extra:
+  generator: false
 theme:
   name: material
   logo: assets/axiom.svg
   favicon: assets/axiom.svg
+  icon:
+    repo: fontawesome/brands/github
   homepage: https://axiom.voxelpi.net
   features:
     - navigation.sections
@@ -17,6 +25,7 @@ theme:
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: green
+      accent: green
       toggle:
         icon: material/weather-sunny
         name: Switch to dark mode
@@ -25,6 +34,7 @@ theme:
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: green
+      accent: green
       toggle:
         icon: material/weather-night
         name: Switch to light mode
