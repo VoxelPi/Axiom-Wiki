@@ -2,24 +2,58 @@
 
 ## Instruction
 
-Every instruction is a 32-bit word.
+Every instruction is encoded in a 32-bit word with the following layout:
 
-Part | Bits | Description
---- | --- | ---
-A | 0 ... 7 | The A operand.
-B | 8 ... 15 | The B operand.
-Mode A | 9 | 0 if A is an intermediate value, 1 if A is the address of an register.
-Mode A | 10 | 0 if B is an intermediate value, 1 if B is the address of an register.
-Output | 18 ... 20 | The output register
-Condition Source | 21 ... 23 | The register that should that should be checked against the condition.
-Condition | 24 ... 26 | The condition that needs to be met for the instruction to be executed.
-Operation | 27 ... 31 | The operation that should be performed.
+![instruction_word](./assets/instruction_word.png)
+
+
+### Operation
+
+The actual operation that should be performed. See the section _Operations_ for a list of all possible operations.
+
+
+### Condition
+
+Each instruction specifies a condition which takes the value `C` from the register specified in `CONDITION ADDRESS` and maps it to either `true` or `false`.
+This evaluation happens just before the instruction would be executed. The instruction is then only executed if the instruction has been evaluated to `true`.
+If the instruction was evaluated to be `false` the instruction is skiped and no other changes are made to the state of the computer.
+The following 8 conditions are available:
+
+Condition | Value | Description
+:---:| :---: | ---
+ALWAYS | `0b000` | Always evaluates to `true` no matter the input.
+NEVER | `0b001` | Always evaluates to `false` no matter the input.
+= 0 | `0b010` | Returns `true` if `C = 0` otherwise `false`.
+≠ 0 | `0b011` | Returns `true` if `C ≠ 0` otherwise `false`.
+< 0 | `0b100` | Returns `true` if `C < 0` otherwise `false`.
+≥ 0 | `0b101` | Returns `true` if `C ≥ 0` otherwise `false`.
+\> 0 | `0b110` | Returns `true` if `C > 0` otherwise `false`.
+≤ 0 | `0b111` | Returns `true` if `C ≤ 0` otherwise `false`.
+
+
+### Output Address
+
+The instruction contains bits 0:2 of the address of the register in which the result of the operation should be stored.
+Note that bit 3 is controlled by the operation itself, for the load_2 instruction the bit is set, otherwise it is cleared.
+
+
+### Operands A & B
+
+Each instruction has two operands, A and B that are the "inputs" to the operation. Each operand consists of a 8bit value `OPERAND` and a mode bit `MODE`, whose value determines how the value is interpreted:
+
+- **MODE = 0**: The 8 bit value is directly used as an immediate value.
+
+- **MODE = 1**: The lower 4 bits of the value are the address of the register whose value is to be used. The upper 4 bits are unused and should be cleared to 0.
+
+![Operand](./assets/operand.png)
+
+
 
 ## Operations
 
 ### Load
 
-A load operation outputs a value.
+Load operations write their input value directly to the output.
 
 Operation | Value | Description
 :---:| :---: | ---
@@ -95,26 +129,8 @@ WRITE | `0b11x10` | Writes the value of `A` to the io port.
 
 ### Break
 
-The break instruction causes the ax08 computer to halt at the end of the instruction. This enables so called "Software Breakpoints".
+The break instruction causes the ax08 computer to halt at the end of the instruction. Combined with conditions this allows for a simple version of "Software Breakpoints".
 
 Operation | Value | Description
 :---:| :---: | ---
 BREAK | `0b11111` | Causes the computer to halt.
-
-
-## Conditions
-
-There are 8 possible conditions that can be used in each instructions. Each of them takes the value `C` from the register specified in `condition_source` and maps it to either `true` or `false`. If the condition is evaluated to `true` the instruction is executed, otherwise the instruction is skipped without any changes made to the state of the computer.
-
-The available conditions are:
-
-Condition | Value | Description
-:---:| :---: | ---
-ALWAYS | `0b000` | Always evaluates to `true` no matter the input.
-NEVER | `0b001` | Always evaluates to `false` no matter the input.
-= 0 | `0b010` | Returns `true` if `C = 0` otherwise `false`.
-≠ 0 | `0b011` | Returns `true` if `C ≠ 0` otherwise `false`.
-< 0 | `0b100` | Returns `true` if `C < 0` otherwise `false`.
-≥ 0 | `0b101` | Returns `true` if `C ≥ 0` otherwise `false`.
-\> 0 | `0b110` | Returns `true` if `C > 0` otherwise `false`.
-≤ 0 | `0b111` | Returns `true` if `C ≤ 0` otherwise `false`.
