@@ -10,7 +10,7 @@ A general purpose, 8-bit computer. Noteworthy features include:
 
 - 8 general purpose register.
 - 16 bit address space
-- 27 differnent instructions, the documentation for which can be found [here](./AX08/instruction_set.md).
+- 27 different instructions, the documentation for which can be found [here](./AX08/instruction_set.md).
 - Each instruction can be conditionally executed.
 - 2 IO Ports.
 - A clock speed of up to 20k instructions per second.
