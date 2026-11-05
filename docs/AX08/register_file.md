@@ -21,8 +21,9 @@ The eight 8-bit registers `R0`..`R7` store values for general computation, they 
 The 16-bit program counter `PC` holds the index of the instruction currently being executed.
 
 Its current value can be read in two parts:
+
 `Alias`|`Address`|`Value`
----|---|---
+:---:| :---: | ---
 `PC_0`|`0b1000`|The lower eigth bits of the program counter.
 `PC_1`|`0b1001`|The upper eight bits of the program counter.
 
