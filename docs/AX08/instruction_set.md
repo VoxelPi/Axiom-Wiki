@@ -9,7 +9,7 @@ Every instruction is encoded in a 32-bit word with the following layout:
 
 ### Operation
 
-This field specifies the operation to perform. Each operation receives two 8-bit input values, `A` and `B`, and produces an 8-bit result that is stored in the output reigster. Depending on the operation one or both inputs may be unused.
+This field specifies the operation to perform. Each operation receives two 8-bit input values, `A` and `B`, and produces an 8-bit result that is stored in the output register. Depending on the operation one or both inputs may be unused.
 
 See the [Operations](#operations) section for a list of supported operations.
 
@@ -20,7 +20,7 @@ Each instruction defines a condition for its execution using two fields:
 - `CONDITION TEST` specifies the check to perform
 - `CONDITION REGISTER` specifies which of the eight general-purpose registers supplies the value `C` to check.
 
-The condition is evaluated immediately before the instruction executes, using the current value `C` of the selected register and producing either `true` or `false`. This happens before the instruction modifies any computer state, so any changes it makes to the condition register do not affect its own condition evaulation.
+The condition is evaluated immediately before the instruction executes, using the current value `C` of the selected register and producing either `true` or `false`. This happens before the instruction modifies any computer state, so any changes it makes to the condition register do not affect its own condition evaluation.
 
 - If the condition evaluates to `true`, the instruction is executed.
 - If the condition evaluates to `false`, the instruction is skipped. The program counter advances to the next instruction, but all other computer state remains unchanged.
@@ -86,9 +86,9 @@ XNOR | `0b00111` | Bitwise xnor.
 
 ### Arithmetic
 
-The arithmetic operations produce their result by performing an arithmetic operation on `A` and `B`. Only the lower eight bits of the calulcated value are retained.
+The arithmetic operations produce their result by performing an arithmetic operation on `A` and `B`. Only the lower eight bits of the calculated value are retained.
 
-Each operation also updates the carry bit. For addition, it is set if the calcualted value exceeds `256`, otherwise it is cleared. For subtraction, it is set if no unsigned borrow is required, otherwise it is clared.
+Each operation also updates the carry bit. For addition, it is set if the calculated value exceeds `256`, otherwise it is cleared. For subtraction, it is set if no unsigned borrow is required, otherwise it is cleared.
 
 In the table below, `carry` refers to the previous value of the carry bit.
 
@@ -107,14 +107,14 @@ The bit shifted out (bit 7 for a left shift and bit 0 for a right shift) is stor
 Operation | Value | Description
 :---:| :---: | ---
 SHIFT LEFT | `0b01100` | Shifts `A` left by one bit and sets bit 0 to `0`. Equivalent to multiplying the unsigned value of A by 2, keeping only the lower eight bits.
-SHIFT RIGHT | `0b01101` | Shifts `A` right by one bit and sets bit 7 to `0`. Eqivalent to dividing the unsigned value of A by 2, rounding down.
+SHIFT RIGHT | `0b01101` | Shifts `A` right by one bit and sets bit 7 to `0`. Equivalent to dividing the unsigned value of A by 2, rounding down.
 ROTATE LEFT | `0b01110` | Shifts `A` left by one bit and sets bit 0 to the previous value of the carry bit.
 ROTATE RIGHT | `0b01111` | Shifts `A` right by one bit and sets bit 7 to the previous value of the carry bit.
 
 
 ### Decode
 
-The decode operations interprete bits 0-2 of `A` as an unsigned 3-bit integer that selects a bit position from 0 (least significant) to 7 (most significant). They produce an 8-bit mask with only the selected bit set or cleared. Bits 3-7 of `A` and the whole input `B` are unused.
+The decode operations interprets bits 0-2 of `A` as an unsigned 3-bit integer that selects a bit position from 0 (least significant) to 7 (most significant). They produce an 8-bit mask with only the selected bit set or cleared. Bits 3-7 of `A` and the whole input `B` are unused.
 
 Operation | Value | Description
 :---:| :---: | ---
@@ -134,13 +134,13 @@ STORE | `0b10101` | Writes the value of `B` to the specified memory address. No 
 
 ### IO
 
-There are two IO units, each supporint the following three operations. Bit 2 of the opcode selects the unit: `0` selects IO unit 0, `1` selects IO unit 1. This bit is marked as `x` in the table.
+There are two IO units, each supporting the following three operations. Bit 2 of the opcode selects the unit: `0` selects IO unit 0, `1` selects IO unit 1. This bit is marked as `x` in the table.
 
 Operation | Value | Description
 :---:| :---: | ---
 POLL | `0b11x00` | Outputs a `1` if a value is available to be read, otherwise outputs `0`.
 READ | `0b11x01` | Reads a value from the io port and outputs it. If no value is available the returned value is undefined.
-WRITE | `0b11x10` | Writes the value of `A` to the io port. No value is written to the output reigster.
+WRITE | `0b11x10` | Writes the value of `A` to the io port. No value is written to the output register.
 
 
 ### Break

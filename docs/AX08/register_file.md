@@ -24,7 +24,7 @@ Its current value can be read in two parts:
 
 `Alias`|`Address`|`Value`
 :---:| :---: | ---
-`PC_0`|`0b1000`|The lower eigth bits of the program counter.
+`PC_0`|`0b1000`|The lower eight bits of the program counter.
 `PC_1`|`0b1001`|The upper eight bits of the program counter.
 
 To write to the program counter, the `LOAD2` operation should be used to set the full 16-bit value of the program counter in one instruction, by writing to address `0b1000` (Alias `PC`).
@@ -55,7 +55,7 @@ The status register cannot be accessed directly through a register address. Howe
 - **CLEAR** `R1 = R1 + 0` clears the carry flag without changing the value of `R1`.
 - **SET** `R1 = R1 - 0` sets the carry flag without changing the value of `R1`.
 
-Combining these techniques it is also possible to read the value of the carry flag non-destructivly in two instructions:
+Combining these techniques it is also possible to read the value of the carry flag non-destructively in two instructions:
 
 ```
 R1 = 0 + 0 with carry    # Read the current value of the carry flag.
