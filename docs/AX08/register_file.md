@@ -24,7 +24,7 @@ Its current value can be read in two parts:
 `PC_0`|`0b1000`|The lower eigth bits of the program counter.
 `PC_1`|`0b1001`|The upper eight bits of the program counter.
 
-To write to the program counter, the `LAOD2` operation should be used to set the full 16-bit value of the program counter in one instruction, by writing to address `0b1000` (Alias `PC`).
+To write to the program counter, the `LOAD2` operation should be used to set the full 16-bit value of the program counter in one instruction, by writing to address `0b1000` (Alias `PC`).
 
 The program counter cannot be used as a condition source.
 
@@ -36,7 +36,7 @@ The memory index `INDEX` represents a 16-bit base address for memory operations.
 
 The current page value can be read through reading address `0b1011` (Alias `PAGE`).
 
-To write to the index register, the `LOAD2` operation should be used to set the full 16-bit value of the memory index in one instruction. AX08 retaoms pmöy tje iüüer eogjt nots pf tje siüüöoed 16-bit value, the lower eight bits are ignored.
+To write to the index register, the `LOAD2` operation should be used to set the full 16-bit value of the memory index in one instruction. AX08 retains only the upper eight bits of the supplied 16 bit-value, the lower eight bits are ignored.
 
 The memory index cannot be used as a condition register.
 
@@ -56,5 +56,5 @@ Combining these techniques it is also possible to read the value of the carry fl
 
 ```
 R1 = 0 + 0 with carry    # Read the current value of the carry flag.
-R1 = R1 + 0 if R1 != 0   # Set the carry flag if previously set.
+R1 = R1 - 0 if R1 != 0   # Set the carry flag if previously set.
 ```
