@@ -4,6 +4,8 @@ The AX08 computer has eight 8-bit general-purpose registers, a 16-bit program co
 
 Except for the status register, all registers are accessed through addresses that depend on how they are used: as an input, as an output, or as a condition source. Not every register supports all three usages, and its read and write addresses may differ.
 
+The initial state of each register on boot is undefined, with the exception of the program counter which always initializes to `0`.
+
 ![instruction_word](./assets/register_file.png)
 
 
