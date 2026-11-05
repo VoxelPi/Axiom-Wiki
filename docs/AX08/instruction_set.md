@@ -9,7 +9,9 @@ Every instruction is encoded in a 32-bit word with the following layout:
 
 ### Operation
 
-The actual operation that should be performed. See the section _Operations_ for a list of all possible operations.
+This field specifies the operation to perform. Each operation receives two 8-bit input values, `A` and `B`, and produces an 8-bit result that is stored in the output reigster. Depending on the operation one or both inputs may be unused.
+
+See the [Operations](#operations) section for a list of supported operations.
 
 
 ### Condition
@@ -38,19 +40,19 @@ NEVER | `0b001` | Never no matter the input.
 ≤ 0 | `0b111` | `C ≤ 0`
 
 
-### Output Address
+### Output Register
 
-The instruction contains bits 0:2 of the address of the register in which the result of the operation should be stored.
-Note that bit 3 is controlled by the operation itself, for the load_2 instruction the bit is set, otherwise it is cleared.
+This part of the instruction specifies bits 0:2 of the address of the register in which the operations result is stored.
+Bit 3 of the register address is determined by the operation: It is set to 1 for load_2 and cleared to 0 for all other operations.
 
 
 ### Operands A & B
 
-Each instruction has two operands, A and B that are the "inputs" to the operation. Each operand consists of a 8bit value `OPERAND` and a mode bit `MODE`, whose value determines how the value is interpreted:
+Each instruction has two operands, A and B, which provide the inputs to the operation. Each operand consists of a 8-bit field, `OPERAND` and a mode bit, `MODE`, which determines how that field is interpreted:
 
-- **MODE = 0**: The 8 bit value is directly used as an immediate value.
+- **Immediate mode (MODE = 0)**: The 8-bit field is used directly as the input value.
 
-- **MODE = 1**: The lower 4 bits of the value are the address of the register whose value is to be used. The upper 4 bits are unused and should be cleared to 0.
+- **Register mode (MODE = 1)**: The lower 4 bits specify the address of the register whose current value should be used as the input. The upper 4 bits are unused and should be cleared to 0.
 
 ![Operand](./assets/operand.png)
 
