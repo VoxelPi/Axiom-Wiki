@@ -45,6 +45,8 @@ NEVER | `0b001` | Never no matter the input.
 This part of the instruction specifies bits 0:2 of the address of the register in which the operations result is stored.
 Bit 3 of the register address is determined by the operation: It is set to 1 for load_2 and cleared to 0 for all other operations.
 
+There that the two operations `MEMORY.STORE` and `IO.WRITE` do not produce an output and therefore do no write to the output register.
+
 
 ### Operands A & B
 
@@ -71,7 +73,7 @@ LOAD | `0b00001` | Output the value of `A`.
 
 ### Logic
 
-The logic operations take the values of `A` and `B` and perform a bitwise logical operation on them, the result of which is then outputed.
+The logic operations produce their result by performing a bitwise logical operation on `A` and `B`.
 
 Operation | Value | Description
 :---:| :---: | ---
@@ -84,62 +86,67 @@ XNOR | `0b00111` | Bitwise xnor.
 
 ### Arithmetic
 
-The arithmetic operations take the values of `A` and `B` and perform an arithmetic operation on them, the result of which is then outputed. Every arithmetic operation also modifies the arithmetic carry bit, depending on the operation and its input values.
+The arithmetic operations produce their result by performing an arithmetic operation on `A` and `B`. Only the lower eight bits of the calulcated value are retained.
 
-Operation | Value | Description
+Each operation also updates the carry bit. For addition, it is set if the calcualted value exceeds `256`, otherwise it is cleared. For subtraction, it is set if no unsigned borrow is required, otherwise it is clared.
+
+In the table below, `carry` refers to the previous value of the carry bit.
+
+Operation | Value | Calculation
 :---:| :---: | ---
-ADD | `0b01000` | Calculates `A` + `B`.
-SUBTRACT | `0b01001` | Calculates `A` - `B`.
-ADD WITH CARRY | `0b01010` | Calculates `A` + `B` + `carry`.
-SUBTRACT WITH CARRY | `0b01011` | Calculates `A` - `B` - (1 - `carry`).
+ADD | `0b01000` | `A` + `B`.
+SUBTRACT | `0b01001` | `A` - `B`.
+ADD WITH CARRY | `0b01010` | `A` + `B` + `carry`.
+SUBTRACT WITH CARRY | `0b01011` | `A` - `B` - (1 - `carry`).
 
 ### Shift
 
-The shift operations take the value of `A` and shift it either to the left or to the right by one bit. The bit that is "shifted out" is always placed in the shift carry bit.
+The shift operations produce their result by shifting `A` left or right by one bit. The input `B` is unused.
+The bit shifted out (bit 7 for a left shift and bit 0 for a right shift) is stored in the carry bit.
 
 Operation | Value | Description
 :---:| :---: | ---
-SHIFT LEFT | `0b01100` | Shifts `A` one to the left. The LSB, bit 0, is set to `0`. This is equivalent to multiplying the unsigned value of `A` with 2.
-SHIFT RIGHT | `0b01101` | Shifts `A` one to the right. The MSB, bit 7, is set to `0`. This is equivalent to dividing the unsigned value of `A` by 2.
-ROTATE LEFT | `0b01110` | Shifts `A` one to the left. The LSB, bit 0, is set to the previous value of the shift carry bit.
-ROTATE RIGHT | `0b01111` | Shifts `A` one to the right. The MSB, bit 7, is set to the previous value of the shift carry bit.
+SHIFT LEFT | `0b01100` | Shifts `A` left by one bit and sets bit 0 to `0`. Equivalent to multiplying the unsigned value of A by 2, keeping only the lower eight bits.
+SHIFT RIGHT | `0b01101` | Shifts `A` right by one bit and sets bit 7 to `0`. Eqivalent to dividing the unsigned value of A by 2, rounding down.
+ROTATE LEFT | `0b01110` | Shifts `A` left by one bit and sets bit 0 to the previous value of the carry bit.
+ROTATE RIGHT | `0b01111` | Shifts `A` right by one bit and sets bit 7 to the previous value of the carry bit.
 
 
 ### Decode
 
-The decode operations take the value of bits 0..2 of `A` as an unsigned 3-bit integer. A bit-mask is then generated, where only the bit specified by that value is set / cleared.
+The decode operations interprete bits 0-2 of `A` as an unsigned 3-bit integer that selects a bit position from 0 (least significant) to 7 (most significant). They produce an 8-bit mask with only the selected bit set or cleared. Bits 3-7 of `A` and the whole input `B` are unused.
 
 Operation | Value | Description
 :---:| :---: | ---
-NDECODE | `0b10000` | Generates a word where all 8 bits are set except for the bit specified by `A` which is cleared.
-DECODE | `0b10001` | Generates a word where all 8 bits are cleared except for the bit specified by `A` which is set.
+NDECODE | `0b10000` | Produces a mask with all bits set except for the selected bit, which is cleared.
+DECODE | `0b10001` | Produces a mask with all bits cleared except the selected bit, which is set.
 
 
 ### Memory
 
-The memory operations are used to read from / write to the memory of the computer. Both operations have in common, that they construct the 16 bit memory address by using `A` for the lower 8 bits of the address and the value of the `PAGE` register for the higher 8 bits.
+The memory operations read from or write to the computers memory. They construct a 16-bit memory address by using `A` as the lower 8 bits and the current value of the `PAGE` register for the upper 8 bits.
 
 Operation | Value | Description
 :---:| :---: | ---
-LOAD | `0b10100` | Loads the value of the memory cell at the current address and writes it to the output.
-STORE | `0b10101` | Stores the value of `B` at the current address. The output of this operation is not written to any register.
+LOAD | `0b10100` | Reads the 8-bit value at the specified memory address and outputs it as the result. Input `B` is unused.
+STORE | `0b10101` | Writes the value of `B` to the specified memory address. No value is written to the output register.
 
 
 ### IO
 
-AX08 has two io units. Each of them has the following three operations. Which io unit is used is indicated by bit 2 of the opcode, in the following table marked as an 'x'. A `0` stands for io-unit 0, a `1` for io-unit 1.
+There are two IO units, each supporint the following three operations. Bit 2 of the opcode selects the unit: `0` selects IO unit 0, `1` selects IO unit 1. This bit is marked as `x` in the table.
 
 Operation | Value | Description
 :---:| :---: | ---
-POLL | `0b11x00` | Outputs a `1` if a value is available to be read, otherwise `0`.
-READ | `0b11x01` | Reads a value from the io port.
-WRITE | `0b11x10` | Writes the value of `A` to the io port.
+POLL | `0b11x00` | Outputs a `1` if a value is available to be read, otherwise outputs `0`.
+READ | `0b11x01` | Reads a value from the io port and outputs it. If no value is available the returned value is undefined.
+WRITE | `0b11x10` | Writes the value of `A` to the io port. No value is written to the output reigster.
 
 
 ### Break
 
-The break instruction causes the ax08 computer to halt at the end of the instruction. Combined with conditions this allows for a simple version of "Software Breakpoints".
+The break instruction causes the computer to halt at the end of the instruction. Combined with an instruction condition, it can be used as a conditional software breakpoint.
 
 Operation | Value | Description
 :---:| :---: | ---
-BREAK | `0b11111` | Causes the computer to halt.
+BREAK | `0b11111` | Halts the computer at the end of the instruction.
