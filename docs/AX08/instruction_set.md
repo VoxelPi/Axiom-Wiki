@@ -14,21 +14,28 @@ The actual operation that should be performed. See the section _Operations_ for 
 
 ### Condition
 
-Each instruction specifies a condition which takes the value `C` from the register specified in `CONDITION ADDRESS` and maps it to either `true` or `false`.
-This evaluation happens just before the instruction would be executed. The instruction is then only executed if the instruction has been evaluated to `true`.
-If the instruction was evaluated to be `false` the instruction is skiped and no other changes are made to the state of the computer.
-The following 8 conditions are available:
+Each instruction defines a condition for its execution using two fields:
+- `CONDITION TEST` specifies the check to perform
+- `CONDITION REGISTER` specifies which of the eight general-purpose registers supplies the value `C` to check.
 
-Condition | Value | Description
+The condition is evaluated immediately before the instruction executes, using the current value `C` of the selected register and producing either `true` or `false`. This happens before the instruction modifies any computer state, so any changes it makes to the condition register do not affect its own condition evaulation.
+
+- If the condition evaluates to `true`, the instruction is executed.
+- If the condition evaluates to `false`, the instruction is skipped. The program counter advances to the next instruction, but all other computer state remains unchanged.
+
+There are 8 possible condition tests.
+For any comparisons with 0, `C` is interpreted as a signed 8-bit two's complement integer ranging from -128 to 127.
+
+Condition | Value | Evaluates to true when
 :---:| :---: | ---
-ALWAYS | `0b000` | Always evaluates to `true` no matter the input.
-NEVER | `0b001` | Always evaluates to `false` no matter the input.
-= 0 | `0b010` | Returns `true` if `C = 0` otherwise `false`.
-≠ 0 | `0b011` | Returns `true` if `C ≠ 0` otherwise `false`.
-< 0 | `0b100` | Returns `true` if `C < 0` otherwise `false`.
-≥ 0 | `0b101` | Returns `true` if `C ≥ 0` otherwise `false`.
-\> 0 | `0b110` | Returns `true` if `C > 0` otherwise `false`.
-≤ 0 | `0b111` | Returns `true` if `C ≤ 0` otherwise `false`.
+ALWAYS | `0b000` | Always no matter the input.
+NEVER | `0b001` | Never no matter the input.
+= 0 | `0b010` | `C = 0`
+≠ 0 | `0b011` | `C ≠ 0`
+< 0 | `0b100` | `C < 0`
+≥ 0 | `0b101` | `C ≥ 0`
+\> 0 | `0b110` | `C > 0`
+≤ 0 | `0b111` | `C ≤ 0`
 
 
 ### Output Address
