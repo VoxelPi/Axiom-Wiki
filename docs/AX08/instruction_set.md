@@ -45,7 +45,7 @@ NEVER | `0b001` | Never no matter the input.
 This part of the instruction specifies bits 0:2 of the address of the register in which the operations result is stored.
 Bit 3 of the register address is determined by the operation: It is set to 1 for load_2 and cleared to 0 for all other operations.
 
-There that the two operations `MEMORY.STORE` and `IO.WRITE` do not produce an output and therefore do no write to the output register.
+There that the two operations `BREAK`, `MEMORY.STORE` and `IO.WRITE` do not produce an output and therefore do no write to the output register.
 
 
 ### Operands A & B
@@ -146,6 +146,8 @@ WRITE | `0b11x10` | Writes the value of `A` to the io port. No value is written 
 ### Break
 
 The break instruction causes the computer to halt at the end of the instruction. Combined with an instruction condition, it can be used as a conditional software breakpoint.
+
+This instruction doesn't produce any result that is written to the output register.
 
 Operation | Value | Description
 :---:| :---: | ---
