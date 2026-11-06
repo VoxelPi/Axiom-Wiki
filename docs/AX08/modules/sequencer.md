@@ -128,7 +128,7 @@ Bit|Flag|Description
 `0`|`state`|Whether the computer is enabled, the current sequencer state and the selected clock index.
 `1`|`instruction`|The current step within the instruction.
 `2`|`config`|The configured clock timings.
-`3`||Unused
+`3`|`version`|The version of the sequencer firmware.
 
 The sequencer replies with `SEQUENCER_STATE` (0b1000_xxxx). The lower four bits are directly copied from the command id. The payload contains the requested segments in the order below. If no segment is requested, the response consists of the id byte and a zero length payload.
 
@@ -149,6 +149,13 @@ If the `config` flag is set, the response includes the following fields in order
 3. The number of configured software timer periods, from 1 to 16.
 The configured software timer periods in clock index order, each encoded as an unsigned 16-bit little-endian integer.
 
+If the `version` flag is set, the response includes the following fields in order:
+
+1. The protocol version of the sequencer as a single 8-bit unsigned integer.
+2. The length `n_version` of the version string as a single 8-bit unsigned integer.
+3. The `n_version` bytes of the version string (excluding the `0` byte).
+4. The length `n_commit` of the git description string as a single 8-bit unsigned integer.
+5. The `n_commit` bytes of the git description string (excluding the `0` byte).
 
 
 ### SELECT_CLOCK (0b0111_xxxx)
