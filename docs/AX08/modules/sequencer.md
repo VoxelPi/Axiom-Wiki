@@ -26,7 +26,7 @@ The standard sequencer firmware comes with four preset different clock speeds:
 - 100 Hz
 - 1 Hz
 
-Adding clock speeds requires changing the sequencer firmware configuration and reflashing the sequencer.
+These presets can be modified via the [clock upload command](#upload_clocks-0b1000_0000) of the the [control Interface](#control-interface).
 
 
 
@@ -70,6 +70,107 @@ To initialize the computer the sequencer pulses `AD_RGSET_OVERRIDE`, which cause
 
 
 
-## Bridge connection
+## Control interface
 
-The sequencer module has an UART interface for connecting to the bride module. This connection is intended to support more advanced debugging. The latest firmware does not yet support this feature.
+The sequencer module exposes a UART control interface. An external device can use it to control execution, query the sequencer state, and upload custom clock timings.
+
+### Packet format
+
+Data is exchanged in packets. Each packet begins with a one-byte id. Commands sent to the sequencer and responses sent back use separate id mappings. Bit 7 of the id determines the packet format. If it is cleared, the packet consists of the id byte only, if it is set, the id is followed by a one-byte unsigned payload length, `n_payload_bytes`, and exactly that many payload bytes. If the external device takes more than ~32ms the sequencer aborts the packet and responds with an `ERROR_TIMEOUT` packet. The payload length counts only the payload bytes. A packet with bit 7 set and `n_payload_bytes=0` still has a total size of 2.
+
+
+
+### Sequencer responses
+
+Specific to response ids is, that bit 6 of the id marks an error. Except for the `SEQUENCER_STATE` response, all sequencer responses are id-only packets. They are:
+
+Alias|Address|Value
+:---:| :---: | ---
+`ACKNOWLEDGE`|`0b00000001`|The sequencer processed the command successfully.
+`ERROR_UNHANDLED`|`0b01000000`|An unhandled error occurred.
+`ERROR_UNKNOWN_CMD`|`0b01000001`|Tje sequencer received an unknown command id.
+`ERROR_TIMEOUT`|`0b01000010`|The sequencer timed out wile waiting for the rest of the packet.
+`ERROR_INVALID_ARGS`|`0b01000011`|The command contained invalid arguments.
+`SEQUENCER_STATE`|`0b10000xxx`|Returns the requested sequencer state. The low four bits match those of the `QUERY_STATE` command.
+
+
+
+### ACTION_TOGGLE_HOLD (0b0000_0001)
+
+Equivalent to pressing the `ACTION` button. When the computer is enabled, this command halts or resumes execution. When the computer is disabled, it resets the computer state.
+
+The sequencer replies with `ACKNOWLEDGE` after processing the command.
+
+
+
+### ACTION_RUN_INSTRUCTION (0b0000_0010)
+
+Equivalent to pressing the `CYCLE` button. Runs one complete instruction or finishes the current instruction if it is already in progress, then halts. When the computer is disabled, the command has no effect.
+
+The sequencer replies with `ACKNOWLEDGE` after processing the command.
+
+
+
+### ACTION_RUN_STEP (0b0000_0011)
+
+Equivalent to pressing the `STEP` button. Runs one sequencer step then halts. When the computer is disabled, the command has no effect.
+
+The sequencer replies with `ACKNOWLEDGE` after processing the command.
+
+
+
+### QUERY_STATE (0b0110_xxxx)
+
+Queries the current sequencer state. The lower 4 bits of the command id select which information to return.
+
+Bit|Flag|Description
+:---:| :---: | ---
+`0`|`state`|Whether the computer is enabled, the current sequencer state and the selected clock index.
+`1`|`instruction`|The current step within the instruction.
+`2`|`config`|The configured clock timings.
+`3`||Unused
+
+The sequencer replies with `SEQUENCER_STATE` (0b1000_xxxx). The lower four bits are directly copied from the command id. The payload contains the requested segments in the order below. If no segment is requested, the response consists of the id byte and a zero length payload.
+
+If the `state` flag is set, the response includes one byte with the following layout:
+
+Bits|Name|Description
+:---:| :---: | ---
+`0`|`enabled`|`1` if the computer is enabled, otherwise `0`.
+`1:3`|`state`|Index of the current sequencer state.
+`4:7`|`selected_clock`|Index of the selected clock speed.
+
+If the `instruction` flag is set, the response includes the current step within the instruction.
+
+If the `config` flag is set, the response includes the following fields in order:
+
+1. The current `T2CON` register, containing information about the hardware timers pre & post scaler.
+2. The configured hardware timer period, one byte.
+3. The number of configured software timer periods, from 1 to 16.
+The configured software timer periods in clock index order, each encoded as an unsigned 16-bit little-endian integer.
+
+
+
+### SELECT_CLOCK (0b0111_xxxx)
+
+Selects the clock speed whose index, `i_clock` is encoded as an unsigned integer in the lower 4 bits of the command id. Clock index `0` selects turbo mode (20kHz).
+
+The sequencer replies with `ACKNOWLEDGE` after processing the command.
+
+
+
+### UPLOAD_CLOCKS (0b1000_0000)
+
+Configures between 1 and 16 clock speeds. The configured clocks can be selected with `SELECT_CLOCK` or cycled through with the `DELAY` button. The configuration is stored in EEPROM and therefore persists across restarts.
+
+Clock index `0` is reserved for the turbo mode. When clock `0` is selected, continuous execution runs at 20kHz regardless of the uploaded timings. The uploaded timings for clock 0 only applies when running a single instruction or a single sequencer step from the halted state.
+
+The payload contains the following fields in order:
+
+1. One byte containing the timer prescaler and postscaler settings, using the `T2CON` register layout.
+2. One byte containing the hardware timer period.
+3. One unsigned 16-bit little-endian software timer period for each configured clock, starting at index 0.
+
+The payload length is `2 + 2*N` bytes for `N` configured clocks, where N is between 1 and 16. If this is not the case, the handler aborts and responds with `ERROR_INVALID_ARGS`.
+
+The sequencer replies with `ACKNOWLEDGE` after processing the command.
