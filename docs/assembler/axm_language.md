@@ -231,12 +231,11 @@ Instruction|Description
 
 These operations also modify the state of the _carry flag_. It is set to the value of the bit, that is shifted "out". The difference between the _shift_ and the _rotate_ instructions is, that the shift instruction sets the emptied bit to 0, whilst the rotate instructions fill it with the current state of the carry flag.
 
-#### Bit instructions
+#### Decode instructions
 
-These statements are designed to allow efficient bit-manipulation. They have the form `<output> = <value> <operator> <bit>`, where `<output>` is a register, `<value>` and `<bit>` are value-like and `<operator>` is one of the following operators:
-Instruction|Description
----|---
-`<output> = <value> bit get <bit>`|Sets output to 1 if the given bit of the value is set, otherwise it is set to 0.
-`<output> = <value> bit set <bit>`|Sets the given bit of the value and stores it in the output
-`<output> = <value> bit clear <bit>`|Clears the given bit of the value and stores it in the output
-`<output> = <value> bit toggle <bit>`|Toggles the given bit of the value and stores it in the output
+The decode instructions generate a bitmask where only the selected bit is set / cleared.
+
+Instruction | Description
+:---: | ---
+`<output> = decode <bit_index>` | Generates a bitmask where only the selected bit is set.
+`<output> = ndecode <bit_index>` | Generates a bitmask where all bits except the selected bit are set.
